@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LeadForge — AI-Powered Lead Generation Dashboard</title>
+  <meta name="description" content="Generate high-quality business leads using Google Maps data powered by Apify. LeadForge helps you find the right prospects fast." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Animated background orbs -->
+  <div class="bg-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2L2 7l10 5 10-5-10-5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M2 17l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <span class="logo-text">LeadForge</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item active" data-page="dashboard" id="nav-dashboard">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/><rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/><rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/><rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/></svg>
+        <span>Dashboard</span>
+      </a>
+      <a href="#" class="nav-item" data-page="generate" id="nav-generate">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/><path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span>Find Leads</span>
+      </a>
+      <a href="#" class="nav-item" data-page="leads" id="nav-leads">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"/><path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke="currentColor" stroke-width="2"/><path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="2"/></svg>
+        <span>My Leads</span>
+        <span class="nav-badge" id="leads-count-badge">0</span>
+      </a>
+      <a href="#" class="nav-item" data-page="history" id="nav-history">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><polyline points="12 8 12 12 14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.05 11a9 9 0 1 0 .5-4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><polyline points="3 3 3 9 9 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>History</span>
+        <span class="nav-badge" id="history-count-badge">0</span>
+      </a>
+      <a href="#" class="nav-item" data-page="settings" id="nav-settings">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span>Settings</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="api-status" id="api-status">
+        <div class="status-dot" id="status-dot"></div>
+        <span id="status-text">No API Key</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+
+    <!-- Header -->
+    <header class="top-header">
+      <div class="header-left">
+        <button class="menu-toggle" id="menu-toggle">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <div class="breadcrumb" id="breadcrumb">Dashboard</div>
+      </div>
+      <div class="header-right">
+        <button class="header-btn" id="export-btn" title="Export leads to CSV">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><polyline points="7 10 12 15 17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Export CSV
+        </button>
+        <div class="user-avatar">U</div>
+      </div>
+    </header>
+
+    <!-- Pages -->
+    <div class="page-container">
+
+      <!-- ── DASHBOARD PAGE ── -->
+      <section class="page active" id="page-dashboard">
+        <div class="page-header">
+          <h1>Welcome back 👋</h1>
+          <p>Here's an overview of your lead generation activity.</p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg,#6366f1,#8b5cf6)">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="white" stroke-width="2"/><circle cx="9" cy="7" r="4" stroke="white" stroke-width="2"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="white" stroke-width="2"/></svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">Total Leads</span>
+              <span class="stat-value" id="stat-total">0</span>
+            </div>
+            <div class="stat-change positive" id="stat-total-change">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg,#06b6d4,#0891b2)">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M5 3h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 12l5 2v4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">With Phone</span>
+              <span class="stat-value" id="stat-phone">0</span>
+            </div>
+            <div class="stat-change" id="stat-phone-pct">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg,#10b981,#059669)">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="white" stroke-width="2"/><polyline points="22,6 12,13 2,6" stroke="white" stroke-width="2"/></svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">With Email</span>
+              <span class="stat-value" id="stat-email">0</span>
+            </div>
+            <div class="stat-change" id="stat-email-pct">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg,#f59e0b,#d97706)">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="white" stroke-width="2" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">Avg Rating</span>
+              <span class="stat-value" id="stat-rating">—</span>
+            </div>
+            <div class="stat-change" id="stat-rating-sub">Overall</div>
+          </div>
+        </div>
+
+        <!-- Recent Leads & Quick Action -->
+        <div class="dashboard-grid">
+          <div class="card">
+            <div class="card-header">
+              <h3>Recent Leads</h3>
+              <button class="text-btn" onclick="showPage('leads')">View all →</button>
+            </div>
+            <div class="recent-leads-list" id="recent-leads-list">
+              <div class="empty-state-small">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                <p>No leads yet. Generate your first batch!</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card quick-start-card">
+            <div class="card-header"><h3>Quick Start</h3></div>
+            <div class="quick-start-body">
+              <div class="qs-step">
+                <div class="qs-num">1</div>
+                <div>
+                  <strong>Add your API key</strong>
+                  <p>Go to Settings and paste your Apify token</p>
+                </div>
+              </div>
+              <div class="qs-step">
+                <div class="qs-num">2</div>
+                <div>
+                  <strong>Define your search</strong>
+                  <p>Choose business type and target location</p>
+                </div>
+              </div>
+              <div class="qs-step">
+                <div class="qs-num">3</div>
+                <div>
+                  <strong>Generate & Export</strong>
+                  <p>Click Generate Leads and export your results</p>
+                </div>
+              </div>
+              <button class="btn-primary full-width" onclick="showPage('generate')" id="qs-generate-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+                Start Generating Leads
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── GENERATE PAGE ── -->
+      <section class="page" id="page-generate">
+        <div class="page-header">
+          <h1>Find New Leads</h1>
+          <p>Configure your search and let Apify's Google Maps Scraper do the work.</p>
+        </div>
+
+        <div class="generate-layout">
+          <!-- Search Form -->
+          <div class="card search-form-card">
+            <div class="card-header">
+              <h3>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/><path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                Search Configuration
+              </h3>
+            </div>
+
+            <div class="form-body">
+              <!-- Business Type -->
+              <div class="form-group">
+                <label for="search-query">Business Type / Keywords <span class="required">*</span></label>
+                <div class="input-with-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z" stroke="currentColor" stroke-width="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" stroke="currentColor" stroke-width="2"/></svg>
+                  <input type="text" id="search-query" placeholder="e.g. dentists, restaurants, law firms" />
+                </div>
+                <div class="tag-suggestions">
+                  <span class="tag" onclick="setTag('restaurants')">🍽 Restaurants</span>
+                  <span class="tag" onclick="setTag('dentists')">🦷 Dentists</span>
+                  <span class="tag" onclick="setTag('law firms')">⚖️ Law Firms</span>
+                  <span class="tag" onclick="setTag('gyms')">💪 Gyms</span>
+                  <span class="tag" onclick="setTag('real estate agents')">🏠 Real Estate</span>
+                  <span class="tag" onclick="setTag('plumbers')">🔧 Plumbers</span>
+                  <span class="tag" onclick="setTag('electricians')">⚡ Electricians</span>
+                  <span class="tag" onclick="setTag('accountants')">📊 Accountants</span>
+                </div>
+              </div>
+
+              <!-- Location -->
+              <div class="form-group">
+                <label for="location-query">Location <span class="required">*</span></label>
+                <div class="input-with-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="2"/></svg>
+                  <input type="text" id="location-query" placeholder="e.g. New York, USA or London, UK" />
+                </div>
+              </div>
+
+              <!-- Row: Max Results + Language -->
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="max-results">Max Results</label>
+                  <div class="input-with-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    <input type="number" id="max-results" value="20" min="1" max="500" />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="language">Language</label>
+                  <div class="select-wrapper">
+                    <select id="language">
+                      <option value="en">English</option>
+                      <option value="es">Spanish</option>
+                      <option value="fr">French</option>
+                      <option value="de">German</option>
+                      <option value="it">Italian</option>
+                      <option value="pt">Portuguese</option>
+                      <option value="ar">Arabic</option>
+                      <option value="zh">Chinese</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Min Rating -->
+              <div class="form-group">
+                <label>Minimum Rating</label>
+                <div class="rating-selector">
+                  <button class="rating-btn active" data-rating="0" id="rating-0">Any</button>
+                  <button class="rating-btn" data-rating="3" id="rating-3">3+ ⭐</button>
+                  <button class="rating-btn" data-rating="3.5" id="rating-3.5">3.5+ ⭐</button>
+                  <button class="rating-btn" data-rating="4" id="rating-4">4+ ⭐</button>
+                  <button class="rating-btn" data-rating="4.5" id="rating-4.5">4.5+ ⭐</button>
+                </div>
+              </div>
+
+              <!-- Filters -->
+              <div class="form-group">
+                <label>Include Only</label>
+                <div class="checkbox-group">
+                  <label class="checkbox-item">
+                    <input type="checkbox" id="filter-phone" checked />
+                    <span class="checkmark"></span>
+                    Has Phone Number
+                  </label>
+                  <label class="checkbox-item">
+                    <input type="checkbox" id="filter-website" />
+                    <span class="checkmark"></span>
+                    Has Website
+                  </label>
+                  <label class="checkbox-item">
+                    <input type="checkbox" id="filter-open" />
+                    <span class="checkmark"></span>
+                    Currently Open
+                  </label>
+                </div>
+              </div>
+
+              <!-- API Key warning -->
+              <div class="api-warning" id="api-warning" style="display:none">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="currentColor" stroke-width="2"/><line x1="12" y1="9" x2="12" y2="13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="17" x2="12.01" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                No API key configured. <button class="inline-btn" onclick="showPage('settings')">Add it in Settings →</button>
+              </div>
+
+              <button class="btn-primary generate-btn" id="generate-btn" onclick="generateLeads()">
+                <span class="btn-content">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+                  Generate Leads
+                </span>
+                <span class="btn-loader" style="display:none">
+                  <span class="spinner"></span> Scraping Google Maps…
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Preview Panel -->
+          <div class="card preview-panel">
+            <div class="card-header">
+              <h3>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/></svg>
+                Search Preview
+              </h3>
+            </div>
+            <div class="preview-body" id="preview-body">
+              <div class="preview-placeholder">
+                <div class="preview-map-icon">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="1.5"/></svg>
+                </div>
+                <p>Fill in the form to preview your search query</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Progress Section (hidden by default) -->
+        <div class="card progress-card" id="progress-card" style="display:none">
+          <div class="progress-header">
+            <div class="progress-pulse"></div>
+            <h3 id="progress-title">Scraping Google Maps…</h3>
+            <span class="progress-time" id="progress-time">0s</span>
+          </div>
+          <div class="progress-bar-wrapper">
+            <div class="progress-bar" id="progress-bar"></div>
+          </div>
+          <div class="progress-steps">
+            <div class="p-step active" id="pstep-1">
+              <div class="p-step-dot"></div><span>Connecting to Apify</span>
+            </div>
+            <div class="p-step" id="pstep-2">
+              <div class="p-step-dot"></div><span>Running actor</span>
+            </div>
+            <div class="p-step" id="pstep-3">
+              <div class="p-step-dot"></div><span>Collecting results</span>
+            </div>
+            <div class="p-step" id="pstep-4">
+              <div class="p-step-dot"></div><span>Done</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── LEADS PAGE ── -->
+      <section class="page" id="page-leads">
+        <div class="page-header">
+          <h1>My Leads</h1>
+          <p>Browse, filter, and manage all your generated leads.</p>
+        </div>
+
+        <!-- Filters bar -->
+        <div class="leads-toolbar">
+          <div class="search-bar">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/><path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <input type="text" id="leads-search" placeholder="Search leads…" oninput="filterLeads()" />
+          </div>
+          <div class="filter-pills">
+            <button class="pill active" data-filter="all" onclick="setLeadFilter('all',this)">All</button>
+            <button class="pill" data-filter="phone" onclick="setLeadFilter('phone',this)">📞 Has Phone</button>
+            <button class="pill" data-filter="website" onclick="setLeadFilter('website',this)">🌐 Has Website</button>
+            <button class="pill" data-filter="rated" onclick="setLeadFilter('rated',this)">⭐ 4+ Rating</button>
+          </div>
+          <button class="btn-icon" onclick="clearAllLeads()" title="Clear all leads" id="clear-leads-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M10 11v6M14 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+
+        <!-- Leads Grid -->
+        <div class="leads-grid" id="leads-grid">
+          <div class="empty-state" id="leads-empty">
+            <div class="empty-icon">
+              <svg width="64" height="64" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.5"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.5"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="1.5"/></svg>
+            </div>
+            <h3>No leads yet</h3>
+            <p>Generate your first batch of leads using the Find Leads page.</p>
+            <button class="btn-primary" onclick="showPage('generate')">Find Leads →</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── HISTORY PAGE ── -->
+      <section class="page" id="page-history">
+        <div class="page-header">
+          <h1>Search History</h1>
+          <p>All your previous lead generation sessions — view, export, or delete any session.</p>
+        </div>
+
+        <!-- History Toolbar -->
+        <div class="history-toolbar">
+          <div class="search-bar">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/><path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <input type="text" id="history-search" placeholder="Search sessions…" oninput="filterHistory()" />
+          </div>
+          <div class="filter-pills" id="history-filter-pills">
+            <button class="pill active" data-hfilter="all" onclick="setHistoryFilter('all',this)">All Sessions</button>
+            <button class="pill" data-hfilter="large" onclick="setHistoryFilter('large',this)">100+ Leads</button>
+            <button class="pill" data-hfilter="small" onclick="setHistoryFilter('small',this)">Under 100</button>
+          </div>
+          <button class="btn-icon" onclick="clearAllHistory()" title="Clear all history" id="clear-history-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M10 11v6M14 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+
+        <!-- History Sessions Grid -->
+        <div class="history-grid" id="history-grid">
+          <div class="empty-state" id="history-empty">
+            <div class="empty-icon">
+              <svg width="64" height="64" viewBox="0 0 24 24" fill="none"><polyline points="12 8 12 12 14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M3.05 11a9 9 0 1 0 .5-4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <h3>No history yet</h3>
+            <p>Each time you generate leads, a session is saved here automatically.</p>
+            <button class="btn-primary" onclick="showPage('generate')">Generate First Leads →</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── SETTINGS PAGE ── -->
+      <section class="page" id="page-settings">
+        <div class="page-header">
+          <h1>Settings</h1>
+          <p>Configure your Apify integration and preferences.</p>
+        </div>
+
+        <div class="settings-layout">
+          <!-- API Config -->
+          <div class="card settings-card">
+            <div class="card-header">
+              <h3>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" stroke="currentColor" stroke-width="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                Apify API Configuration
+              </h3>
+            </div>
+            <div class="settings-body">
+              <div class="form-group">
+                <label for="api-key-input">Apify API Token <span class="required">*</span></label>
+                <div class="api-key-wrapper">
+                  <input type="password" id="api-key-input" placeholder="apify_api_xxxxxxxxxxxxxxxxxxxx" autocomplete="off" />
+                  <button class="toggle-visibility" onclick="toggleApiKeyVisibility()" id="toggle-vis-btn" title="Show/hide token">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" id="eye-icon"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/></svg>
+                  </button>
+                </div>
+                <p class="field-hint">Find your token at <a href="https://console.apify.com/account/integrations" target="_blank">console.apify.com → Integrations</a></p>
+              </div>
+
+              <div class="form-group">
+                <label for="actor-id-input">Actor ID</label>
+                <input type="text" id="actor-id-input" value="compass~crawler-google-places" />
+                <p class="field-hint">Default: <code>compass~crawler-google-places</code> (Apify's official Google Maps Scraper)</p>
+              </div>
+
+              <div class="form-row">
+                <button class="btn-primary" onclick="saveSettings()" id="save-settings-btn">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" stroke="currentColor" stroke-width="2"/><polyline points="17 21 17 13 7 13 7 21" stroke="currentColor" stroke-width="2"/><polyline points="7 3 7 8 15 8" stroke="currentColor" stroke-width="2"/></svg>
+                  Save Settings
+                </button>
+                <button class="btn-ghost" onclick="testApiKey()" id="test-api-btn">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><polyline points="22 4 12 14.01 9 11.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  Test Connection
+                </button>
+              </div>
+
+              <div class="alert-box" id="settings-alert" style="display:none"></div>
+            </div>
+          </div>
+
+          <!-- Info Card -->
+          <div class="card info-card">
+            <div class="card-header"><h3>📌 How It Works</h3></div>
+            <div class="info-body">
+              <p>LeadForge uses <strong>Apify's Google Maps Scraper</strong> (<code>compass~crawler-google-places</code>) to extract real business data from Google Maps.</p>
+              <div class="info-item">
+                <span class="info-label">Actor</span>
+                <span>compass~crawler-google-places</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Data</span>
+                <span>Name, phone, email, website, address, rating, reviews, hours</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Pricing</span>
+                <span>Apify free tier: ~1,000 results/month. Paid plans available.</span>
+              </div>
+              <a href="https://apify.com/compass/crawler-google-places" target="_blank" class="info-link">
+                View Actor on Apify Store →
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div><!-- /page-container -->
+  </main>
+
+  <!-- Lead Detail Modal -->
+  <div class="modal-overlay" id="modal-overlay" onclick="closeModal()">
+    <div class="modal" id="lead-modal" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeModal()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <div id="modal-content"></div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
